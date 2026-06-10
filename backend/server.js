@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 require("dotenv").config();
 const pool = require("./db");
@@ -6,12 +7,8 @@ const pool = require("./db");
 const app = express();
 app.use(cors());
 app.use(express.json());
-
-// Test route
-app.get("/", (req, res) => {
-  // res.json({ message: 'PAU Housing API is running!' });
-  res.sendFile(path.join(__dirname, "index.html"));
-});
+app.use(express.static(path.join(__dirname, "..", "frontend", "pages")));
+app.use(express.static(path.join(__dirname, "..", "frontend")));
 
 // Get all properties
 app.get("/api/properties", async (req, res) => {
