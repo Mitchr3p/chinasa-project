@@ -3,7 +3,7 @@
 // Connects frontend to Node.js backend API
 // ==========================================
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = '/api';
 
 // Sample images to cycle through for property cards
 const PROPERTY_IMAGES = [

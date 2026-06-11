@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Property Details — PAU Housing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body>
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-brand"><span class="nav-logo">🏛</span><span class="nav-title">PAU Housing</span></div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="properties.html">Properties</a></li>
+      <li><a href="landlords.html">Landlords</a></li>
+      <li><a href="login.html" class="btn-nav">Login</a></li>
+      <li><a href="register.html" class="btn-nav-outline">Sign Up</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger">&#9776;</button>
+  </nav>
+
+  <div class="page-hero-mini">
+    <h1 id="propertyName">Property Details</h1>
+    <p id="propertyAddress" class="property-meta">📍 Loading...</p>
+  </div>
+
+  <section class="section detail-layout">
+    <div class="detail-image">
+      <img id="propertyImage" src="" alt="Property image" style="width:100%;border-radius:12px;"/>
+    </div>
+    <div class="detail-info">
+      <span class="property-badge" id="propertyType">—</span>
+      <h2 id="detailRent" class="detail-price">—</h2>
+      <div class="detail-meta">
+        <p><strong>Distance from PAU:</strong> <span id="propertyDistance">—</span></p>
+        <p><strong>Address:</strong> <span id="propertyFullAddress">—</span></p>
+      </div>
+      <div class="detail-actions">
+        <button class="btn-primary" onclick="saveCurrentProperty()">♡ Save Property</button>
+        <a href="properties.html" class="btn-outline">← Back to Listings</a>
+      </div>
+    </div>
+  </section>
+
+  <script src="../js/main.js"></script>
+  <script>
+    const IMAGES = [
+      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80',
+      'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
+      'https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?w=800&q=80',
+    ];
+
+    let currentProperty = null;
+
+    async function loadProperty() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      if (!id) {
+        document.querySelector('.detail-layout').innerHTML = '<p class="loading-text">No property ID specified.</p>';
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/properties/${id}`);
+        if (!res.ok) throw new Error('Not found');
+        currentProperty = await res.json();
+        renderProperty(currentProperty);
+      } catch {
+        loadSampleProperty(Number(id));
+      }
+    }
+
+    function loadSampleProperty(id) {
+      const samples = [
+        { id:1, name:'Sunrise Lodge', address:'Beside PAU Gate, Ibeju-Lekki', rent:350000, room_type:'self-contain', distance_from_school:0.3 },
+        { id:2, name:'Grace Apartment', address:'Abraham Adesanya Estate, Ajah', rent:280000, room_type:'shared', distance_from_school:0.8 },
+        { id:3, name:'Royal Chambers', address:'Bogije, Ibeju-Lekki', rent:480000, room_type:'flat', distance_from_school:1.2 },
+        { id:4, name:'Palm View Hostel', address:'Lakowe Estate', rent:220000, room_type:'single', distance_from_school:2.0 },
+        { id:5, name:'Lekki Gardens', address:'Ibeju-Lekki', rent:400000, room_type:'self-contain', distance_from_school:0.6 },
+        { id:6, name:'Blue Crest Rooms', address:'Ajah, Lagos', rent:310000, room_type:'shared', distance_from_school:1.5 },
+      ];
+      const prop = samples.find(s => s.id === id);
+      if (!prop) {
+        document.querySelector('.detail-layout').innerHTML = '<p class="loading-text">Property not found.</p>';
+        return;
+      }
+      currentProperty = prop;
+      renderProperty(prop);
+    }
+
+    function renderProperty(p) {
+      document.getElementById('propertyName').textContent = p.name;
+      document.getElementById('propertyAddress').textContent = `📍 ${p.address} · 🚶 ${p.distance_from_school}km from PAU`;
+      document.getElementById('propertyImage').src = IMAGES[(p.id - 1) % IMAGES.length];
+      document.getElementById('propertyType').textContent = p.room_type;
+      document.getElementById('detailRent').innerHTML = `₦${Number(p.rent).toLocaleString()} <span style="font-size:1rem;font-weight:400;color:#666;">/yr</span>`;
+      document.getElementById('propertyDistance').textContent = `${p.distance_from_school} km`;
+      document.getElementById('propertyFullAddress').textContent = p.address;
+      document.title = `${p.name} — PAU Housing`;
+    }
+
+    function saveCurrentProperty() {
+      if (!currentProperty) return;
+      saveProperty(currentProperty);
+    }
+
+    document.getElementById('hamburger')?.addEventListener('click', () => {
+      document.getElementById('navLinks').classList.toggle('open');
+    });
+
+    loadProperty();
+  </script>
+</body>
+</html>

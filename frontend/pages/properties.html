@@ -111,7 +111,7 @@
         if (type)    qp.append('room_type', type);
         if (maxRent) qp.append('max_rent', maxRent);
 
-        const res  = await fetch(`http://localhost:3000/api/properties?${qp}`);
+        const res  = await fetch(`/api/properties?${qp}`);
         let data   = await res.json();
 
         if (maxDist) data = data.filter(p => p.distance_from_school <= Number(maxDist));
